@@ -12,14 +12,6 @@ def transform_cad_fi(file_path):
 
     df.columns = df.columns.str.lower().str.strip()
 
-    if "cnpj_fundo" in df.columns:
-        df["cnpj_fundo"] = (
-            df["cnpj_fundo"]
-            .str.replace(".", "", regex=False)
-            .str.replace("/", "", regex=False)
-            .str.replace("-", "", regex=False)
-        )
-        
     for col in df.columns:
         df[col] = df[col].str.strip()
 
