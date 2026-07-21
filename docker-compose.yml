@@ -1,0 +1,10 @@
+
+
+services:
+  banco_cvm:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: cvm
+    ports:
+      - "5432:5432"
