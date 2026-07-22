@@ -16,5 +16,30 @@ services:
       timeout: 5s
       retries: 10
 
+  api:
+    build: .
+    container_name: cvm_api
+    environment:
+      POSTGRES_HOST: banco_cvm
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: cvm
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "8000:8000"
+    depends_on:
+      banco_cvm:
+        condition: service_healthy
+
+  frontend:
+    image: nginx:alpine
+    container_name: cvm_frontend
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    ports:
+      - "5500:80"
+    depends_on:
+      - api
+
 volumes:
   postgres_data:
