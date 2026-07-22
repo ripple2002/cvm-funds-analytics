@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CVM Funds Analytics</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <h1>CVM Funds Analytics</h1>
+        <p>Consulta de fundos de investimento</p>
+    </header>
+
+    <main>
+        <section>
+            <h2>Consultar fundo</h2>
+
+            <form id="fund-form">
+                <div>
+                    <label for="cnpj">CNPJ</label>
+
+                    <input
+                        id="cnpj"
+                        type="text"
+                        placeholder="00.000.000/0000-00"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label for="start-date">Data inicial</label>
+                    <input id="start-date" type="date">
+                </div>
+
+                <div>
+                    <label for="end-date">Data final</label>
+                    <input id="end-date" type="date">
+                </div>
+
+                <button type="submit">Consultar</button>
+            </form>
+
+            <p id="fund-message"></p>
+        </section>
+
+        <section id="summary-section" class="hidden">
+            <h2>Resumo</h2>
+
+            <div class="cards">
+                <article>
+                    <span>Cota atual</span>
+                    <strong id="quota">-</strong>
+                </article>
+
+                <article>
+                    <span>Patrimônio líquido</span>
+                    <strong id="net-asset-value">-</strong>
+                </article>
+
+                <article>
+                    <span>Cotistas</span>
+                    <strong id="shareholders">-</strong>
+                </article>
+
+                <article>
+                    <span>Retorno no período</span>
+                    <strong id="period-return">-</strong>
+                </article>
+
+                <article>
+                    <span>Captação líquida</span>
+                    <strong id="net-flow">-</strong>
+                </article>
+            </div>
+        </section>
+
+        <section id="history-section" class="hidden">
+            <h2>Histórico</h2>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Cota</th>
+                            <th>Patrimônio</th>
+                            <th>Captação</th>
+                            <th>Resgate</th>
+                            <th>Fluxo líquido</th>
+                            <th>Cotistas</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="history-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <div class="ranking-header">
+                <h2>Ranking por patrimônio</h2>
+
+                <button id="ranking-button" type="button">
+                    Carregar ranking
+                </button>
+            </div>
+
+            <p id="ranking-message"></p>
+
+            <div
+                id="ranking-container"
+                class="table-container hidden"
+            >
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Posição</th>
+                            <th>Fundo</th>
+                            <th>CNPJ</th>
+                            <th>Patrimônio</th>
+                            <th>Cotistas</th>
+                            <th>Última data</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="ranking-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
