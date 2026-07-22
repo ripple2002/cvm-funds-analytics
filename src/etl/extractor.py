@@ -43,18 +43,11 @@ def download_cvm_file(url: str, dest_dir: str = "data/raw", chunk_size: int = 81
 
     return target
 
+def get_cad_fi_url() -> str:
+    return "https://dados.cvm.gov.br/dados/FI/CAD/DADOS/cad_fi.csv"
 
 
-if __name__ == "__main__":
-    URL_CADASTRO = "https://dados.cvm.gov.br/dados/FI/CAD/DADOS/cad_fi.csv"
-    CAMINHO_DESTINO = Path("data/raw/cad_fi.csv")
+def get_inf_diario_url(ano: str, mes: str) -> str:
+    return f"https://dados.cvm.gov.br/dados/FI/DOC/INF_DIARIO/DADOS/inf_diario_fi_{ano}{mes}.zip"
 
-    print("--- Teste 1: Primeiro Download (Deve ir no servidor) ---")
-    arquivo_salvo = download_cvm_file(URL_CADASTRO)
-    print(f"Resultado: {arquivo_salvo}\n")
 
-    print("--- Teste 2: Segundo Download (Deve bater no Cache) ---")
-    arquivo_salvo = download_cvm_file(URL_CADASTRO)
-    print(f"Resultado: {arquivo_salvo}")
-
-    arquivo_salvo = download_cvm_file("https://dados.cvm.gov.br/dados/FI/DOC/INF_DIARIO/DADOS/inf_diario_fi_202606.zip")
