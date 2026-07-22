@@ -1,13 +1,13 @@
 import os
-from etl.extractor import download_cvm_file, get_cad_fi_url, get_inf_diario_url
-from etl.loader import init_db, load_cadastro, load_informe_diario
+from etl.extractor import download_cvm_file, get_registro_classe_url, get_inf_diario_url
+from etl.loader import init_db, load_classe, load_informe_diario
 
 def main():
 
     month_window = [
-        ("2024", "04"),
-        ("2024", "05"),
-        ("2024", "06"),
+        ("2026", "04"),
+        ("2026", "05"),
+        ("2026", "06"),
     ]
 
     db_config = {
@@ -20,8 +20,8 @@ def main():
 
     init_db(db_config)
 
-    cad_path = download_cvm_file(get_cad_fi_url())
-    load_cadastro(cad_path, db_config)
+    cad_path = download_cvm_file(get_registro_classe_url(), inner_filename="registro_classe.csv")
+    load_classe(cad_path, db_config)
 
     for ano, mes in month_window:
         ano_mes = f"{ano}{mes}"
