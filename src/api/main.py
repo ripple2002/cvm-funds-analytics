@@ -49,6 +49,8 @@ def normalize_cnpj(cnpj: Optional[str]) -> Optional[str]:
 def get_db_connection():
     return psycopg.connect(row_factory=dict_row, **get_db_config())
 
+
+
 @app.get("/funds", summary="Buscar fundos cadastrados")
 def search_funds(
     q: Optional[str] = Query(None, description="Termo de busca para o nome do fundo (denom_social)"),
@@ -75,6 +77,8 @@ def search_funds(
             cur.execute(query, params)
             results = cur.fetchall()
             return {"total": len(results), "data": results}
+        
+
 
 @app.get("/funds/{cnpj}/reports", summary="Consultar informe diário de um fundo")
 def get_fund_reports(
@@ -262,6 +266,7 @@ def get_fund_summary(
             }
         
 
+
 @app.get("/analytics/ranking")
 def get_funds_ranking(
     limit: int = Query(10, ge=1, le=100),
@@ -308,6 +313,8 @@ def get_funds_ranking(
                     )
                 ],
             }
+        
+
         
 @app.get("/debug/database")
 def debug_database():
