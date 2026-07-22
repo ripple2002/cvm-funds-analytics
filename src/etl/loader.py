@@ -1,13 +1,16 @@
 from pathlib import Path
 import psycopg
+from transformer import transform_cad_fi, transform_informe_diario
 
 
 DDL_SCHEMA = """
+
+DROP TABLE IF EXISTS informe_diario CASCADE;
 DROP TABLE IF EXISTS cadastro_geral CASCADE;
 
 CREATE TABLE cadastro_geral (
     tp_fundo TEXT,
-    cnpj_fundo TEXT,
+    cnpj_fundo VARCHAR(14) PRIMARY KEY,
     denom_social TEXT,
     dt_reg TEXT,
     dt_const TEXT,
@@ -34,28 +37,24 @@ CREATE TABLE cadastro_geral (
     vl_patrim_liq TEXT,
     dt_patrim_liq TEXT,
     diretor TEXT,
-    cnpj_admin TEXT,
+    cnpj_admin VARCHAR(14),
     admin TEXT,
     pf_pj_gestor TEXT,
     cpf_cnpj_gestor TEXT,
     gestor TEXT,
-    cnpj_auditor TEXT,
+    cnpj_auditor VARCHAR(14),
     auditor TEXT,
-    cnpj_custodiante TEXT,
+    cnpj_custodiante VARCHAR(14),
     custodiante TEXT,
-    cnpj_controlador TEXT,
+    cnpj_controlador VARCHAR(14),
     controlador TEXT,
     invest_cempr_exter TEXT,
     classe_anbima TEXT
 );
-CREATE INDEX IF NOT EXISTS idx_cad_cnpj ON cadastro_geral (cnpj_fundo);
-
-
-DROP TABLE IF EXISTS informe_diario CASCADE;
 
 CREATE TABLE informe_diario (
     tp_fundo_classe TEXT,
-    cnpj_fundo_classe TEXT,
+    cnpj_fundo_classe VARCHAR(14), 
     id_subclasse TEXT,
     dt_comptc DATE,
     vl_total NUMERIC(18, 2),
@@ -63,14 +62,12 @@ CREATE TABLE informe_diario (
     vl_patrim_liq NUMERIC(18, 2),
     captc_dia NUMERIC(18, 2),
     resg_dia NUMERIC(18, 2),
-    nr_cotst INTEGER
-);
+    nr_cotst INTEGER,
+    
+    PRIMARY KEY (cnpj_fundo_classe, dt_comptc)
 
 CREATE INDEX IF NOT EXISTS idx_informe_data_pl 
 ON informe_diario (dt_comptc DESC, vl_patrim_liq DESC);
-
-CREATE INDEX IF NOT EXISTS idx_informe_cnpj 
-ON informe_diario (cnpj_fundo_classe);
 """
 
 
@@ -79,21 +76,27 @@ def init_db(config: dict) -> None:
         cur.execute(DDL_SCHEMA)
 
 
-def load_cadastro(file_path: Path, config: dict) -> None:
-    with psycopg.connect(**config) as conn, conn.cursor() as cur, open(file_path, "rb") as f:
+def load_cadastro(file_path: Path | str, config: dict) -> None:
+    df_limpo = transform_cad_fi(file_path)
+
+    with psycopg.connect(**config) as conn, conn.cursor() as cur:
         cur.execute("TRUNCATE TABLE cadastro_geral CASCADE;")
-        
-        query = r"COPY cadastro_geral FROM STDIN WITH (FORMAT CSV, HEADER true, DELIMITER ';', ENCODING 'LATIN1', QUOTE E'\b')"
-        
-        with cur.copy(query) as copy:
-            while chunk := f.read(65536):
-                copy.write(chunk)
+
+        with cur.copy("COPY cadastro_geral FROM STDIN;") as copy:
+            for row in df_limpo.itertuples(index=False, name=None):
+                copy.write_row(row)
 
 
-def load_informe_mensal(file_path: Path, ano_mes: str, config: dict) -> None:
-    with psycopg.connect(**config) as conn, conn.cursor() as cur, open(file_path, "rb") as f:
-        cur.execute("DELETE FROM informe_diario WHERE TO_CHAR(dt_comptc, 'YYYYMM') = %s;", (ano_mes,))
-        
-        with cur.copy("COPY informe_diario FROM STDIN WITH (FORMAT CSV, HEADER true, DELIMITER ';', ENCODING 'LATIN1')") as copy:
-            while chunk := f.read(65536):
-                copy.write(chunk)
+def load_informe_diario(file_path: Path | str, ano_mes: str, config: dict) -> None:
+    df_limpo = transform_informe_diario(file_path)
+    
+    with psycopg.connect(**config) as conn, conn.cursor() as cur:
+        cur.execute(
+            "DELETE FROM informe_diario WHERE TO_CHAR(dt_comptc, 'YYYYMM') = %s;",
+            (ano_mes,),
+        )
+
+        with cur.copy("COPY informe_diario FROM STDIN;") as copy:
+            for row in df_limpo.itertuples(index=False, name=None):
+                copy.write_row(row)
+
