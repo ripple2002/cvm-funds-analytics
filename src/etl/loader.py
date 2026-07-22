@@ -1,6 +1,6 @@
 from pathlib import Path
 import psycopg
-from transformer import transform_cad_fi, transform_informe_diario
+from .transformer import transform_cad_fi, transform_informe_diario
 
 
 DDL_SCHEMA = """
@@ -65,6 +65,7 @@ CREATE TABLE informe_diario (
     nr_cotst INTEGER,
     
     PRIMARY KEY (cnpj_fundo_classe, dt_comptc)
+);
 
 CREATE INDEX IF NOT EXISTS idx_informe_data_pl 
 ON informe_diario (dt_comptc DESC, vl_patrim_liq DESC);
