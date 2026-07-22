@@ -2,7 +2,10 @@ from pathlib import Path
 import requests
 import zipfile
 
-def download_cvm_file(url: str, dest_dir: str = "data/raw", chunk_size: int = 8192) -> Path:
+
+
+
+def download_cvm_file(url: str, dest_dir: str = "data/raw", chunk_size: int = 8192, inner_filename: str | None = None) -> Path:
     
     file_name = url.split("/")[-1]
     
@@ -10,7 +13,10 @@ def download_cvm_file(url: str, dest_dir: str = "data/raw", chunk_size: int = 81
     
     target.parent.mkdir(parents=True, exist_ok=True)
 
-    final_target = target.with_suffix(".csv") if target.suffix == ".zip" else target
+    if inner_filename:
+        final_target = target.parent / inner_filename
+    else:
+        final_target = target.with_suffix(".csv") if target.suffix == ".zip" else target
 
     if final_target.exists() and final_target.stat().st_size > 0:
         return final_target
@@ -33,7 +39,7 @@ def download_cvm_file(url: str, dest_dir: str = "data/raw", chunk_size: int = 81
             with zipfile.ZipFile(target, "r") as zip_ref:
                 zip_ref.extractall(target.parent)
             
-            target.unlink() # Apaga o .zip pesado após extrair
+            target.unlink() 
             return final_target
 
     except Exception:
@@ -43,11 +49,10 @@ def download_cvm_file(url: str, dest_dir: str = "data/raw", chunk_size: int = 81
 
     return target
 
-def get_cad_fi_url() -> str:
-    return "https://dados.cvm.gov.br/dados/FI/CAD/DADOS/cad_fi.csv"
+
+def get_registro_classe_url() -> str:
+    return "https://dados.cvm.gov.br/dados/FI/CAD/DADOS/registro_fundo_classe.zip"
 
 
 def get_inf_diario_url(ano: str, mes: str) -> str:
     return f"https://dados.cvm.gov.br/dados/FI/DOC/INF_DIARIO/DADOS/inf_diario_fi_{ano}{mes}.zip"
-
-
