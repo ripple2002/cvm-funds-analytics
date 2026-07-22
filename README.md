@@ -50,6 +50,21 @@ cvm-funds-analytics/
 └── README.md
 ```
 
+## Pré-requisitos
+
+Para executar o projeto, é necessário ter Docker e Docker Compose instalados.
+
+### Windows e macOS
+
+Instale o Docker Desktop e confirme que ele está aberto antes de executar o projeto.
+
+Valide a instalação:
+
+```bash
+docker --version
+docker compose version
+docker info
+
 ## Como executar
 
 ### 1. Subir os containers
